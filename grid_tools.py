@@ -7,19 +7,19 @@ Created on Thu Dec 11 15:54:26 2014
 
 import pygame
 import numpy as np
-from grid_globals import tilesize,wallsize
+#from grid_globals import tilesize,wallsize
 
 
 #function that converts board location (i,j) to screen location (x,y)
-def getXYOffset(i,j):
-    x=(j%2)*wallsize + (j//2)*(tilesize+wallsize)
-    y=(i%2)*wallsize + (i//2)*(tilesize+wallsize)
+def getXYOffset(i,j,graphics):
+    x=(j%2)*graphics.wallsize + (j//2)*(graphics.tilesize+graphics.wallsize)
+    y=(i%2)*graphics.wallsize + (i//2)*(graphics.tilesize+graphics.wallsize)
     return x,y
 
 #function that converts robot grid location (16*16) to screen location (x,y)
-def getXYGridOffset(i,j):
-    x=wallsize + (j-1)*(tilesize+wallsize)
-    y=wallsize + (i-1)*(tilesize+wallsize)
+def getXYGridOffset(i,j,graphics):
+    x=graphics.wallsize + (j-1)*(graphics.tilesize+graphics.wallsize)
+    y=graphics.wallsize + (i-1)*(graphics.tilesize+graphics.wallsize)
     return x,y
 
 
