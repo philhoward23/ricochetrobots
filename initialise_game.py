@@ -31,8 +31,8 @@ class Board(object):
         self.boardstate[gridsize-1:gridsize+2,gridsize-1:gridsize+2] = np.full((3,3),2,dtype=int)
         
         #create robots map too
-        #self.robot_colours=["yellow","red","green","blue","silver"]
-        self.robot_colours=["yellow"]
+        self.robot_colours=["yellow","red","green","blue","silver"]
+        #self.robot_colours=["yellow"]
         self.robots={colour:None for colour in self.robot_colours}
 
         
@@ -53,6 +53,7 @@ class Board(object):
         #pick a random target from possibles
         self.flagloc=flaglocs[np.random.randint(len(flaglocs))]
         self.boardstate[getIJBoard(*self.flagloc)]=-1     
+        self.flag_colour="yellow"
         
         #randomise robot start position(s)
         for colour in self.robot_colours:
@@ -62,10 +63,18 @@ class Board(object):
         #display configuration
         for i in range(self.boardsize):
             print self.boardstate[i]
+    
+    #move_active_robot    
+    def process_keypress(self,key):
+        if key in (pygame.K_LEFT,pygame.K_RIGHT,pygame.K_UP,pygame.K_DOWN):
+            self.robots[self.active_robot].move(self,key)
+        elif key in (pygame.K_1,pygame.K_2,pygame.K_3,pygame.K_4,pygame.K_5):
+            self.active_robot=self.robot_colours[int(pygame.key.name(key))-1]
+        else:
+            #no action for this key
+            print "Input not recognised"
+            return
             
-    def move_active_robot(self,key):
-        self.robots[self.active_robot].move(self,key)
-
 class Robot(object):
     #robot inhabits a gridsize*gridsize game board
     #that maps into the boardsize*boardsize game boardstate, which inludes walls
@@ -93,24 +102,36 @@ class Robot(object):
         if key == pygame.K_LEFT:
             #find first non-collision square to left
             boardjnew=1+np.max(np.where(board.boardstate[boardi,0:boardj]>0))
+            #shift to right one if a robot collision to account for space between tiles
+            if board.boardstate[boardi,boardjnew-1]==3:
+                boardjnew=boardjnew+1
             board.boardstate[boardi,boardj]=0
             board.boardstate[boardi,boardjnew]=3
             inew,jnew=getIJGrid(boardi,boardjnew)
         elif key == pygame.K_RIGHT:
             #find first non-collision square to right
             boardjnew=boardj+np.min(np.where(board.boardstate[boardi,boardj+1:]>0))
+            #shift to left one if a robot collision to account for space between tiles
+            if board.boardstate[boardi,boardjnew+1]==3:
+                boardjnew=boardjnew-1
             board.boardstate[boardi,boardj]=0
             board.boardstate[boardi,boardjnew]=3
             inew,jnew=getIJGrid(boardi,boardjnew)
         elif key == pygame.K_UP:
             #find first non-collision square above
             boardinew=1+np.max(np.where(board.boardstate[0:boardi,boardj]>0))
+            #shift down one if a robot collision to account for space between tiles
+            if board.boardstate[boardinew-1,boardj]==3:
+                boardinew=boardinew+1            
             board.boardstate[boardi,boardj]=0
             board.boardstate[boardinew,boardj]=3
             inew,jnew=getIJGrid(boardinew,boardj)
         elif key == pygame.K_DOWN:
             #find first non-collision square below
             boardinew=boardi+np.min(np.where(board.boardstate[boardi+1:,boardj]>0))
+            #shift up one if a robot collision to account for space between tiles
+            if board.boardstate[boardinew+1,boardj]==3:
+                boardinew=boardinew-1            
             board.boardstate[boardi,boardj]=0
             board.boardstate[boardinew,boardj]=3
             inew,jnew=getIJGrid(boardinew,boardj)
