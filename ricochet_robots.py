@@ -22,11 +22,7 @@ board.initialise()
 
 #initialise display of board
 images = Graphics(gridsize,boardsize)
-
-screen=pygame.display.set_mode(images.screensize)
-screen.fill(images.background)
-
-images.draw_initial_board(screen,board)
+images.draw_initial_board(images.screen,board)
 
 #respond to input
 while 1:
@@ -39,7 +35,7 @@ while 1:
             #move_active_robot(event.key)
             
             #animate motion
-            images.animate(screen,board,event.key)
+            images.animate(images.screen,board,event.key)
             
             print 'key pressed'
                     

@@ -6,38 +6,44 @@ Created on Sun Dec 28 11:49:54 2014
 """
 import pygame
 from grid_tools import getXYOffset,getXYGridOffset,getIJBoard,getIJGrid,check_flag_between_grid_locations
+from sidebar import Sidebar
 
 #functions to initialise graphics for ricochet robots
 def load_graphics(graphics):
     #default floor tile
-    graphics.floor = pygame.image.load("graphics/floor_small.png")
+    graphics.floor = pygame.image.load("graphics/floor_small.png").convert()
     
     #vertical, horizontal and fill walls
-    graphics.wall_v = pygame.image.load("graphics/wall_v_small.png")
-    graphics.wall_h = pygame.image.load("graphics/wall_h_small.png")
-    graphics.wall_c = pygame.image.load("graphics/wall_c.png")
+    graphics.wall_v = pygame.image.load("graphics/wall_v_small.png").convert()
+    graphics.wall_h = pygame.image.load("graphics/wall_h_small.png").convert()
+    graphics.wall_c = pygame.image.load("graphics/wall_c.png").convert()
     
     #robots and flags
-    graphics.robots={"yellow":pygame.image.load("graphics/robot_yellow_small.png"),
-                     "red":pygame.image.load("graphics/robot_red_small.png"),
-                     "green":pygame.image.load("graphics/robot_green_small.png"),
-                     "blue":pygame.image.load("graphics/robot_blue_small.png"),
-                     "silver":pygame.image.load("graphics/robot_silver_small.png")}
+    graphics.robots={"yellow":pygame.image.load("graphics/robot_yellow_small.png").convert(),
+                     "red":pygame.image.load("graphics/robot_red_small.png").convert(),
+                     "green":pygame.image.load("graphics/robot_green_small.png").convert(),
+                     "blue":pygame.image.load("graphics/robot_blue_small.png").convert(),
+                     "silver":pygame.image.load("graphics/robot_silver_small.png").convert()}
                      
-    graphics.flags={"yellow":pygame.image.load("graphics/flag_yellow_small.png"),
-                    "red":pygame.image.load("graphics/flag_red_small.png"),
-                    "green":pygame.image.load("graphics/flag_green_small.png"),
-                    "blue":pygame.image.load("graphics/flag_blue_small.png")}
+    graphics.flags={"yellow":pygame.image.load("graphics/flag_yellow_small.png").convert(),
+                    "red":pygame.image.load("graphics/flag_red_small.png").convert(),
+                    "green":pygame.image.load("graphics/flag_green_small.png").convert(),
+                    "blue":pygame.image.load("graphics/flag_blue_small.png").convert()}
+        
+    #sidebar
+    #title
+    graphics.title = pygame.image.load("graphics/title.png").convert()     
     
     #robot
     graphics.robot = graphics.robots["yellow"]
     
     #flag
-    graphics.flag = graphics.flags["yellow"]
+    graphics.flag = graphics.flags["yellow"]   
     
     #dimensions for drawing
     graphics.tilesize = graphics.floor.get_width()
     graphics.wallsize = graphics.wall_c.get_width()
+    graphics.sidebar_width = graphics.title.get_width()
 
 def get_n_frames(xold,yold,xnew,ynew,speed):
     #assumes only movement is parallel to an axis ie one of x and y is fixed
@@ -48,15 +54,38 @@ def get_n_frames(xold,yold,xnew,ynew,speed):
 
 class Graphics(object):
     def __init__(self, gridsize, boardsize):
+        #initialise display for converting pixel format of images
+        self.screen=pygame.display.set_mode()
+        
         #load images and set dimensions
         load_graphics(self)
         
-        self.screensize = width, height = gridsize*self.tilesize+(gridsize+1)*self.wallsize,gridsize*self.tilesize+(gridsize+1)*self.wallsize
+        self.screensize = width, height = gridsize*self.tilesize + (gridsize+1)*self.wallsize + self.sidebar_width,gridsize*self.tilesize+(gridsize+1)*self.wallsize
+        self.sidebar_rect = pygame.Rect(width-self.sidebar_width,0,self.sidebar_width,height)
         self.speed = 2 #pixels per frame
         self.black=0,0,0
         self.background=200,200,200
+        self.screen=pygame.display.set_mode(self.screensize)
+        pygame.display.set_caption("Ricochet Robots")
+        self.screen.fill(self.background)  
+    
+    def redraw_flag(self,screen,board):
+        screen.blit(self.flags[board.flag_colour],getXYGridOffset(board.flagloc[0],board.flagloc[1],self))
+        pygame.display.flip()
+    
+    def redraw_robots(self,screen,board):    
+        for colour in board.robot_colours:
+            screen.blit(self.robots[colour],getXYGridOffset(board.robots[colour].position[0],board.robots[colour].position[1],self))        
+        pygame.display.flip()
         
+    
     def draw_initial_board(self,screen,board):
+        #sidebar
+        self.sidebar=Sidebar(self,screen,board)
+        screen.blit(self.title,self.sidebar_rect)
+        
+        
+        
         #draw
         for i in range(board.gridsize):
             for j in range(board.gridsize):
@@ -82,7 +111,7 @@ class Graphics(object):
                         (getXYOffset(i,j,self)))
                         
         #draw flag
-        screen.blit(self.flags[board.flag_colour],getXYGridOffset(board.flagloc[0],board.flagloc[1],self))
+        self.redraw_flag(screen,board)
                 
         #draw robot(s)
         self.robot_rects={}
@@ -100,7 +129,10 @@ class Graphics(object):
         robot_image=self.robots[board.active_robot]
         #copy of active rectangle - must update before returning
         robotrect=self.robot_rects[board.active_robot]
-        
+        #ensure info pane has correct info
+        if key in (pygame.K_1,pygame.K_2,pygame.K_3,pygame.K_4,pygame.K_5):
+            self.sidebar.update_active_text(board.active_robot) 
+            
         #determine number of frames from speed and dieffrence between new robot position and old
         xnew,ynew=getXYGridOffset(robot.position[0],
                                     robot.position[1],
