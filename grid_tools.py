@@ -29,26 +29,37 @@ def getIJBoard(i,j):
     y=2*j-1
     return x,y
 
+#function that converts board location (33*33, zero-indexed) to robot grid location (16*16)
+def getIJGrid(i,j):
+    x=1+i//2
+    y=1+j//2
+    return x,y
 
-def moveRobot(boardstate,i,j,key):
-    boardi,boardj=getIJBoard(i,j)
-    inew,jnew=i,j
-    if key == pygame.K_LEFT:
-        print i,j
-        print boardi,boardj
-        inew=i
-        #find first non-collision square to left
-        boardjnew=1+np.max(np.where(boardstate[boardi][0:boardj]>0))
-        boardstate[boardi,boardj]=0
-        boardstate[boardi,boardjnew]=3
-        jnew=1+boardjnew//2
-        print inew,jnew
-    elif key == pygame.K_RIGHT:
-        pass
-    elif key == pygame.K_UP:
-        pass
-    elif key == pygame.K_DOWN:
-        pass
+
+def check_flag_between_grid_locations(flagloc,position,last_position):
+    #first check between x locs
+    if last_position[0] >= position[0]:
+        if (flagloc[0] >= position[0]) and (flagloc[0] <= last_position[0]):
+            xflag = True
+        else:
+            xflag = False
     else:
-        pass
-    return(boardstate,inew,jnew)
+        if (flagloc[0] >= last_position[0]) and (flagloc[0] <= position[0]):
+            xflag = True
+        else:
+            xflag = False
+    #then check y locs
+    if last_position[1] >= position[1]:
+        if (flagloc[1] >= position[1]) and (flagloc[1] <= last_position[1]):
+            yflag = True
+        else:
+            yflag = False
+    else:
+        if (flagloc[1] >= last_position[1]) and (flagloc[1] <= position[1]):
+            yflag = True
+        else:
+            yflag = False            
+    return xflag and yflag        
+            
+            
+        

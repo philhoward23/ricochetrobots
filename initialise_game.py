@@ -6,39 +6,9 @@ Created on Thu Dec 25 22:48:05 2014
 """
 import pygame
 import numpy as np
-from grid_tools import getXYOffset,getXYGridOffset,moveRobot,getIJBoard
+from grid_tools import getXYOffset,getXYGridOffset,getIJBoard,getIJGrid
 
-#functions to initialise board and graphics for ricochet robots
-def load_graphics(graphics):
-    #default floor tile
-    graphics.floor = pygame.image.load("graphics/floor_small.png")
-    
-    #vertical, horizontal and fill walls
-    graphics.wall_v = pygame.image.load("graphics/wall_v_small.png")
-    graphics.wall_h = pygame.image.load("graphics/wall_h_small.png")
-    graphics.wall_c = pygame.image.load("graphics/wall_c.png")
-    
-    #robot
-    graphics.robot = pygame.image.load("graphics/robot.png")
-    
-    #flag
-    graphics.flag = pygame.image.load("graphics/flag.png")
-    
-    #dimensions for drawing
-    graphics.tilesize = graphics.floor.get_width()
-    graphics.wallsize = graphics.wall_c.get_width()
-
-
-class Graphics(object):
-    def __init__(self, gridsize, boardsize):
-        #load images and set dimensions
-        load_graphics(self)
-        
-        self.screensize = width, height = gridsize*self.tilesize+(gridsize+1)*self.wallsize,gridsize*self.tilesize+(gridsize+1)*self.wallsize
-        #speed = [2,2]
-        self.black=0,0,0
-        self.background=200,200,200
-
+#functions to initialise board for ricochet robots
         
 class Board(object):
     #boardstate is an integer array representing the game board state, where:
@@ -46,7 +16,7 @@ class Board(object):
     #1=wall
     #2=centre tiles
     #3=robot
-    #4=flag
+    #-1=flag, negative since positive values block robot movement
     def __init__(self,gridsize,boardsize):
         self.gridsize = gridsize
         self.boardsize = boardsize
@@ -82,7 +52,7 @@ class Board(object):
         flaglocs=[(10,4)]
         #pick a random target from possibles
         self.flagloc=flaglocs[np.random.randint(len(flaglocs))]
-        self.boardstate[getIJBoard(*self.flagloc)]=4       
+        self.boardstate[getIJBoard(*self.flagloc)]=-1     
         
         #randomise robot start position(s)
         for colour in self.robot_colours:
@@ -92,6 +62,9 @@ class Board(object):
         #display configuration
         for i in range(self.boardsize):
             print self.boardstate[i]
+            
+    def move_active_robot(self,key):
+        self.robots[self.active_robot].move(self,key)
 
 class Robot(object):
     #robot inhabits a gridsize*gridsize game board
@@ -105,12 +78,50 @@ class Robot(object):
                     and jrobot not in (self.gridsize//2,(self.gridsize//2)+1)
                     and board.boardstate[getIJBoard(irobot,jrobot)]==0):
                 self.position=[irobot,jrobot]
+                self.last_position=self.position
+                self.turn_start_position=self.position
                 board.boardstate[getIJBoard(*self.position)]=3
 #                screen.blit(images.robot,getXYGridOffset(irobot,jrobot,images))
 #                robotrect=images.robot.get_rect()
                 break
         
-    def move(self,coords,boardstate):
-        return None
-                
+    def move(self,board,key):
+        #map robot coords to boardstate coords
+        boardi,boardj=getIJBoard(*self.position)
+        #initialise new coords at current coords
+        inew,jnew=self.position
+        if key == pygame.K_LEFT:
+            #find first non-collision square to left
+            boardjnew=1+np.max(np.where(board.boardstate[boardi,0:boardj]>0))
+            board.boardstate[boardi,boardj]=0
+            board.boardstate[boardi,boardjnew]=3
+            inew,jnew=getIJGrid(boardi,boardjnew)
+        elif key == pygame.K_RIGHT:
+            #find first non-collision square to right
+            boardjnew=boardj+np.min(np.where(board.boardstate[boardi,boardj+1:]>0))
+            board.boardstate[boardi,boardj]=0
+            board.boardstate[boardi,boardjnew]=3
+            inew,jnew=getIJGrid(boardi,boardjnew)
+        elif key == pygame.K_UP:
+            #find first non-collision square above
+            boardinew=1+np.max(np.where(board.boardstate[0:boardi,boardj]>0))
+            board.boardstate[boardi,boardj]=0
+            board.boardstate[boardinew,boardj]=3
+            inew,jnew=getIJGrid(boardinew,boardj)
+        elif key == pygame.K_DOWN:
+            #find first non-collision square below
+            boardinew=boardi+np.min(np.where(board.boardstate[boardi+1:,boardj]>0))
+            board.boardstate[boardi,boardj]=0
+            board.boardstate[boardinew,boardj]=3
+            inew,jnew=getIJGrid(boardinew,boardj)
+        else:
+            pass
+        
+        #check flag location is updated if robot has moved off        
+        if (tuple(self.position)==board.flagloc) and (self.position!=[inew,jnew]):
+            board.boardstate[boardi,boardj]=-1
+        #update robot position variables
+        self.last_position=self.position            
+        self.position=[inew,jnew]        
+        #return(boardstate,inew,jnew)                
                 
