@@ -38,7 +38,10 @@ while 1:
             images.animate(images.screen,board,event.key)
             
             print 'key pressed'
-                    
+            #check victory condition
+            if board.check_victory():
+                images.sidebar.update_info_text('You made it to the flag','Congratulations!')        
+            
         #screen.fill(black)
         #pygame.display.flip()
         

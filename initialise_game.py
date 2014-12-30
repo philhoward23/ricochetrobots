@@ -60,20 +60,56 @@ class Board(object):
             self.robots[colour]=Robot(colour,self)
         self.active_robot="yellow"
         
+        self.victory=False
+        self.moves_taken=0
+        
         #display configuration
         for i in range(self.boardsize):
             print self.boardstate[i]
     
+    
+    def reset_turn(self):
+        for colour in self.robot_colours:
+            #erase current location
+            self.boardstate[getIJBoard(*tuple(self.robots[colour].position))]=0
+            #reset to turn start
+            self.robots[colour].position=self.robots[colour].turn_start_position
+            self.robots[colour].last_position=self.robots[colour].turn_start_position
+            self.boardstate[getIJBoard(*tuple(self.robots[colour].position))]=3
+            
+        #reset flag    
+        self.boardstate[getIJBoard(*self.flagloc)]=-1     
+        self.victory=False
+        self.moves_taken=0
+
     #move_active_robot    
     def process_keypress(self,key):
-        if key in (pygame.K_LEFT,pygame.K_RIGHT,pygame.K_UP,pygame.K_DOWN):
+        #check for victory state - only allows reset options
+        if self.victory:
+            if key not in (pygame.K_r,pygame.K_n):
+                print "In victory state, please reset turn or start a new game"
+                return
+        
+        #check for reset (pressed r)
+        if key==pygame.K_r:
+            self.reset_turn()
+        elif key in (pygame.K_LEFT,pygame.K_RIGHT,pygame.K_UP,pygame.K_DOWN):
             self.robots[self.active_robot].move(self,key)
         elif key in (pygame.K_1,pygame.K_2,pygame.K_3,pygame.K_4,pygame.K_5):
             self.active_robot=self.robot_colours[int(pygame.key.name(key))-1]
         else:
             #no action for this key
             print "Input not recognised"
-            return
+        return
+            
+    def check_victory(self):
+        #need to reach the flag with the same coloured robot
+        if (tuple(self.robots[self.active_robot].position)==self.flagloc) and (self.flag_colour==self.active_robot):
+            self.victory=True
+            return True
+        else:
+            self.victory=False
+            return False
             
 class Robot(object):
     #robot inhabits a gridsize*gridsize game board
@@ -138,10 +174,14 @@ class Robot(object):
         else:
             pass
         
-        #check flag location is updated if robot has moved off        
-        if (tuple(self.position)==board.flagloc) and (self.position!=[inew,jnew]):
-            board.boardstate[boardi,boardj]=-1
-        #update robot position variables
+        #was this a valid move?
+        if (self.position!=[inew,jnew]):
+            board.moves_taken+=1
+            #check flag location is updated if robot has moved off        
+            if (tuple(self.position)==board.flagloc):
+                board.boardstate[boardi,boardj]=-1
+                
+        #update robot position variables including if no move was made so animated correctly
         self.last_position=self.position            
         self.position=[inew,jnew]        
         #return(boardstate,inew,jnew)                

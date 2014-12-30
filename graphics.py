@@ -80,11 +80,11 @@ class Graphics(object):
         
     
     def draw_initial_board(self,screen,board):
-        #sidebar
-        self.sidebar=Sidebar(self,screen,board)
-        screen.blit(self.title,self.sidebar_rect)
-        
-        
+        #sidebar - check if already exists in case of board reset
+        if hasattr(self, 'sidebar'):
+            self.sidebar.__init__(self,screen,board)
+        else:
+            self.sidebar=Sidebar(self,screen,board)        
         
         #draw
         for i in range(board.gridsize):
@@ -113,16 +113,26 @@ class Graphics(object):
         #draw flag
         self.redraw_flag(screen,board)
                 
-        #draw robot(s)
+        #draw robot(s) at their turn start positions
         self.robot_rects={}
         for colour in board.robot_colours:
-            screen.blit(self.robots[colour],getXYGridOffset(board.robots[colour].position[0],board.robots[colour].position[1],self))
+            screen.blit(self.robots[colour],getXYGridOffset(board.robots[colour].turn_start_position[0],board.robots[colour].turn_start_position[1],self))
             self.robot_rects[colour]=self.robots[colour].get_rect()
-            self.robot_rects[colour]=self.robot_rects[colour].move(getXYGridOffset(board.robots[colour].position[0],board.robots[colour].position[1],self))
+            self.robot_rects[colour]=self.robot_rects[colour].move(getXYGridOffset(board.robots[colour].turn_start_position[0],board.robots[colour].turn_start_position[1],self))
         
         pygame.display.flip()
         
-    def animate(self,screen,board,key):
+    def animate(self,screen,board,key):                
+        #check for reset (pressed r)
+        if key==pygame.K_r:
+            self.draw_initial_board(screen,board)
+            return
+        
+        #check for victory state - only allows reset options unless still needs to do the final animation to reach that state
+        if board.victory and ((self.robot_rects[board.active_robot].left,self.robot_rects[board.active_robot].top)==getXYGridOffset(board.flagloc[0],board.flagloc[1],self)):
+            if key not in (pygame.K_r,pygame.K_n):
+                return        
+        
         #find active robot
         robot=board.robots[board.active_robot]
         #image
@@ -244,7 +254,10 @@ class Graphics(object):
         else:
             return
         
+        #update moves taken and final robot rectangle
+        self.sidebar.update_moves_text(board.moves_taken)
         self.robot_rects[board.active_robot]=robotrect
+                
         return
             
 
