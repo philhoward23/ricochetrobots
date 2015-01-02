@@ -124,13 +124,13 @@ class Graphics(object):
         
     def animate(self,screen,board,key):                
         #check for reset (pressed r)
-        if key==pygame.K_r:
+        if key in (pygame.K_r,pygame.K_n,pygame.K_g):
             self.draw_initial_board(screen,board)
             return
         
         #check for victory state - only allows reset options unless still needs to do the final animation to reach that state
         if board.victory and ((self.robot_rects[board.active_robot].left,self.robot_rects[board.active_robot].top)==getXYGridOffset(board.flagloc[0],board.flagloc[1],self)):
-            if key not in (pygame.K_r,pygame.K_n):
+            if key not in (pygame.K_r,pygame.K_n,pygame.K_g):
                 return        
         
         #find active robot
@@ -140,7 +140,7 @@ class Graphics(object):
         #copy of active rectangle - must update before returning
         robotrect=self.robot_rects[board.active_robot]
         #ensure info pane has correct info
-        if key in (pygame.K_1,pygame.K_2,pygame.K_3,pygame.K_4,pygame.K_5):
+        if key in (pygame.K_1,pygame.K_2,pygame.K_3,pygame.K_4,pygame.K_5,pygame.K_KP1,pygame.K_KP2,pygame.K_KP3,pygame.K_KP4,pygame.K_KP5):
             self.sidebar.update_active_text(board.active_robot) 
             
         #determine number of frames from speed and dieffrence between new robot position and old

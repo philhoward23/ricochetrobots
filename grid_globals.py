@@ -9,5 +9,5 @@ Created on Thu Dec 11 16:11:24 2014
 gridsize=16
 boardsize=1+2*gridsize
 
-tilesize=40
+tilesize=30
 wallsize=10

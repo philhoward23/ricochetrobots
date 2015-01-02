@@ -81,21 +81,37 @@ class Board(object):
         self.boardstate[getIJBoard(*self.flagloc)]=-1     
         self.victory=False
         self.moves_taken=0
+        
+    def new_turn(self):
+        #choose new flag location and colour, leave robots in place
+        return
 
+    def new_game(self):
+        #choose new board configurations and initialise again
+        return
+        
     #move_active_robot    
     def process_keypress(self,key):
         #check for victory state - only allows reset options
         if self.victory:
-            if key not in (pygame.K_r,pygame.K_n):
+            if key not in (pygame.K_r,pygame.K_n,pygame.K_g):
                 print "In victory state, please reset turn or start a new game"
                 return
         
         #check for reset (pressed r)
         if key==pygame.K_r:
             self.reset_turn()
+        #check for new turn (pressed n)
+        elif key==pygame.K_n:
+            self.new_turn()
+        #check for new game (pressed g)
+        elif key==pygame.K_g:
+            self.new_game() 
+        #check for movement
         elif key in (pygame.K_LEFT,pygame.K_RIGHT,pygame.K_UP,pygame.K_DOWN):
             self.robots[self.active_robot].move(self,key)
-        elif key in (pygame.K_1,pygame.K_2,pygame.K_3,pygame.K_4,pygame.K_5):
+        #check for switch active robot
+        elif key in (pygame.K_1,pygame.K_2,pygame.K_3,pygame.K_4,pygame.K_5,pygame.K_KP1,pygame.K_KP2,pygame.K_KP3,pygame.K_KP4,pygame.K_KP5):
             self.active_robot=self.robot_colours[int(pygame.key.name(key))-1]
         else:
             #no action for this key
