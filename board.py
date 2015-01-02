@@ -44,6 +44,36 @@ class Board(object):
         bottom_right = self.tiles[board_order[2]][board_variants[2]]            
         bottom_left = self.tiles[board_order[3]][board_variants[3]]  
         
+        #assemble game board
+        game_board = top_left["tile"]
+        top_right_tile = np.rot90(top_right["tile"],3)
+        
+        #check overlap and join
+        game_board[:,self.boardsize-1] = np.max(game_board[:,self.boardsize-1],top_right_tile[:,0])
+        game_board = np.hstack(game_board, top_right_tile[:,1:])
+        
+        #generate bottom half of game board
+        bottom_right_tile = np.rot90(bottom_right["tile"],2)
+        bottom_left_tile = np.rot90(bottom_left["tile"],1)
+        bottom_left_tile[:,self.boardsize-1] = np.max(bottom_left_tile[:,self.boardsize-1],bottom_right_tile[:,0])
+        bottom_half = np.hstack(bottom_left_tile, bottom_right_tile[:,1:])
+        
+        #check overlap and join
+        game_board[self.boardsize-1,:] = np.max(game_board[self.boardsize-1,:],bottom_half[0,:])
+        game_board = np.vstack(game_board, bottom_half[1:,:])
+        
+        #determine flag locations
+        flags = {"red":[], "yellow":[], "green":[], "blue":[], "rainbow":[]}
+        
+        for colour in flags.keys():
+            if top_left["flags"][colour] is not None:
+                flags[colour].append(top_left["flags"][colour])
+            if top_right["flags"][colour] is not None:
+                flags[colour].append(rotate_clockwise(top_right["flags"][colour],self.gridsize))
+            if bottom_right["flags"][colour] is not None:
+                flags[colour].append(rotate_clockwise(top_right["flags"][colour],self.gridsize))
+
+        
         return game_board, flags
        
     def __init__(self):
@@ -54,11 +84,11 @@ class Board(object):
         #define all 8 possible tiles                
         self.tiles = [ [ {"vwalls":[(1,2), (2,4), (3,2), (4,7), (7,3)],
                      "hwalls":[(1,5), (2,2), (4,7), (6,1), (7,4)], 
-                     "flags":{"red":(2,5), "yellow":(4,7), "green":(3,2), "blue":(7,4)}
+                     "flags":{"red":(2,5), "yellow":(4,7), "green":(3,2), "blue":(7,4), "rainbow":None}
                     },
                     {"vwalls":[(1,5), (2,7), (3,1), (6,7), (7,3)],
                      "hwalls":[(2,2), (2,7), (5,7), (6,1), (7,4)], 
-                     "flags":{"red":(7,4), "yellow":(2,7), "green":(3,2), "blue":(6,7)}
+                     "flags":{"red":(7,4), "yellow":(2,7), "green":(3,2), "blue":(6,7), "rainbow":None}
                     } 
                   ],
                   [ {"vwalls":[(1,5), (2,3), (4,1), (5,6), (7,6), (8,4)],
@@ -72,20 +102,20 @@ class Board(object):
                   ],
                   [ {"vwalls":[(1,4), (2,1), (3,7), (5,3), (6,7)],
                      "hwalls":[(2,2), (2,7), (5,3), (5,8), (6,1)], 
-                     "flags":{"red":(2,2), "yellow":(6,8), "green":(3,7), "blue":(5,3)}
+                     "flags":{"red":(2,2), "yellow":(6,8), "green":(3,7), "blue":(5,3), "rainbow":None}
                     },
                     {"vwalls":[(1,4), (3,6), (5,3), (6,7), (7,1)],
                      "hwalls":[(3,6), (4,3), (5,1), (6,2), (6,8)], 
-                     "flags":{"red":(6,8), "yellow":(7,2), "green":(5,3), "blue":(3,6)}
+                     "flags":{"red":(6,8), "yellow":(7,2), "green":(5,3), "blue":(3,6), "rainbow":None}
                     } 
                   ],
                   [ {"vwalls":[(1,4), (2,6), (3,1), (5,6), (7,3)],
                      "hwalls":[(2,6), (3,2), (4,1), (4,7), (6,3)], 
-                     "flags":{"red":(3,2), "yellow":(5,7), "green":(2,6), "blue":(7,3)}
+                     "flags":{"red":(3,2), "yellow":(5,7), "green":(2,6), "blue":(7,3), "rainbow":None}
                     },
                     {"vwalls":[(1,5), (2,2), (4,6), (6,5), (7,2)],
                      "hwalls":[(1,3), (4,7), (5,1), (5,5), (7,2)], 
-                     "flags":{"red":(6,5), "yellow":(2,3), "green":(7,2), "blue":(4,7)}
+                     "flags":{"red":(6,5), "yellow":(2,3), "green":(7,2), "blue":(4,7), "rainbow":None}
                     } 
                   ]
                 ]
