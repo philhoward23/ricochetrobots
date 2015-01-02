@@ -75,17 +75,21 @@ class Board(object):
         self.moves_taken=0
         
     def new_turn(self):
-        #choose new flag location and colour, leave robots in place
         self.turn+=1
-        self.flagloc=self.flaglocs[self.flag_order[self.turn]]["location"]
-        self.flag_colour=self.flaglocs[self.flag_order[self.turn]]["colour"]
-        
-        #reset flag    
-        #check whether a robot is here first TODO
-        if self.boardstate[getIJBoard(*self.flagloc)]==0:
-            self.boardstate[getIJBoard(*self.flagloc)]=-1   
-        self.victory=False
-        self.moves_taken=0
+        if self.turn<17:
+            #choose new flag location and colour, leave robots in place
+            self.flagloc=self.flaglocs[self.flag_order[self.turn]]["location"]
+            self.flag_colour=self.flaglocs[self.flag_order[self.turn]]["colour"]
+            
+            #reset flag    
+            #check whether a robot is here first TODO
+            if self.boardstate[getIJBoard(*self.flagloc)]==0:
+                self.boardstate[getIJBoard(*self.flagloc)]=-1   
+            self.victory=False
+            self.moves_taken=0
+        else:
+            #all flag positions solved for this game - user must (r)eset or start a new (g)ame
+            return
 
     def new_game(self):
         #choose new board configurations and initialise again

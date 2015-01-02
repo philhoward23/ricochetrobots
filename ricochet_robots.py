@@ -19,7 +19,7 @@ board.initialise()
 
 #initialise display of board
 images = Graphics(board.gridsize,board.boardsize)
-images.draw_initial_board(images.screen,board)
+images.draw_initial_board(board)
 
 #respond to input
 while 1:
@@ -32,7 +32,7 @@ while 1:
             #move_active_robot(event.key)
             
             #animate motion
-            images.animate(images.screen,board,event.key)
+            images.animate(board,event.key)
             
             print 'key pressed'
             #check victory condition

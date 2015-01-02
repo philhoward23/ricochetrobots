@@ -45,8 +45,8 @@ class Sidebar(object):
         self.screen.blit(self.info_text_line2, self.info_text_line2_rect)          
         pygame.display.update(self.info_text_line2_rect)
         
-    def __init__(self,graphics,screen,board):
-        self.screen = screen
+    def __init__(self,graphics,board):
+        self.screen = graphics.screen
         self.background=graphics.background
         #title graphic
         self.screen.blit(graphics.title,graphics.sidebar_rect)

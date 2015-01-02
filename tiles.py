@@ -35,7 +35,8 @@ class Tiles(object):
         bottom_left = self.tiles[board_order[3]][board_variants[3]]  
         
         #assemble game board
-        game_board = top_left["tile"]
+        #make sure to take copies rather than risk modifying tiles eg when taking maximum in what follows. rot90 returns a copy
+        game_board = np.copy(top_left["tile"])
         top_right_tile = np.rot90(top_right["tile"],3)
         
         #check overlap and join
