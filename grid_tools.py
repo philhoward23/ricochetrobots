@@ -5,7 +5,6 @@ Created on Thu Dec 11 15:54:26 2014
 @author: phil.howard
 """
 
-import pygame
 import numpy as np
 #from grid_globals import tilesize,wallsize
 
@@ -61,5 +60,25 @@ def check_flag_between_grid_locations(flagloc,position,last_position):
             yflag = False            
     return xflag and yflag        
             
-            
+               
+def rot90_coord(coord,n_rots=1,gridsize=8):
+    #rotate around grid centre by 90 degrees anti-clockwise, n_rots times
+    shift_matrix = np.array((gridsize/2 + 0.5, gridsize/2 + 0.5), dtype=float)
+    centred_coord = np.array(coord,dtype=float) - shift_matrix
+    if n_rots==1:        
+        rotation_matrix = np.array(((0,-1),(1,0)),dtype=float)
+    elif n_rots==2:        
+        rotation_matrix = np.array(((-1,0),(0,-1)),dtype=float)
+    elif n_rots==3:        
+        rotation_matrix = np.array(((0,1),(-1,0)),dtype=float)
+    else:
+        raise ValueError('number of rotations must be 1,2 or 3')
+        return 1
+    rotated_coord = np.dot(rotation_matrix, centred_coord)
+    final_coord = rotated_coord + shift_matrix
+    #convert back to integer tuple coordinates
+    return tuple(map(int,final_coord))
+    
+def offset_coord(coord,i_offset,j_offset):
+    return coord[0]+i_offset, coord[1]+j_offset
         

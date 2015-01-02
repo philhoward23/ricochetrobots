@@ -5,23 +5,13 @@ Created on Thu Jan 01 19:34:06 2015
 @author: Phil.Howard
 """
 
-import pygame
 import numpy as np
-from grid_tools import getXYOffset,getXYGridOffset,getIJBoard,getIJGrid
+from grid_tools import rot90_coord,offset_coord
 
-def rotate_clockwise(coord,gridsize):
-    shift_matrix = np.array((gridsize/2 + 0.5, gridsize/2 + 0.5), dtype=float)
-    centred_coord = np.array(coord,dtype=float) - shift_matrix
-    rotation_matrix = np.array(((0,1),(-1,0)),dtype=float)
-    rotated_coord = np.dot(rotation_matrix, centred_coord)
-    final_coord = rotated_coord + shift_matrix
-    #convert back to integer tuple coordinates
-    return tuple(map(int,final_coord))
-    
-    
+
 #store and initialise board configurations
 #game comes with 4 2-sided tiles that can be combined - 2*(3*2)*(2*2)*(1*2)=96 configurations possible
-class Board(object):
+class Tiles(object):
     def initialise_tile(self,board,tile):
         current_tile = np.full((self.boardsize,self.boardsize),0,dtype=int)
         #default walls
@@ -29,7 +19,7 @@ class Board(object):
         current_tile[0,:] = [1]*self.boardsize
         #centre walls
         current_tile[self.boardsize-3:,self.boardsize-3:] = np.full((3,3),1,dtype=int)
-        current_tile[self.boardsize-2:,self.boardsize-2:] = np.full((3,3),2,dtype=int)            
+        current_tile[self.boardsize-2:,self.boardsize-2:] = np.full((2,2),2,dtype=int)            
         
         self.tiles[board][tile]["tile"] = current_tile
         #self.boards[board][tile] = current_tile
@@ -49,31 +39,30 @@ class Board(object):
         top_right_tile = np.rot90(top_right["tile"],3)
         
         #check overlap and join
-        game_board[:,self.boardsize-1] = np.max(game_board[:,self.boardsize-1],top_right_tile[:,0])
-        game_board = np.hstack(game_board, top_right_tile[:,1:])
+        game_board[:,self.boardsize-1] = np.maximum(game_board[:,self.boardsize-1],top_right_tile[:,0])
+        game_board = np.hstack((game_board, top_right_tile[:,1:]))
         
         #generate bottom half of game board
         bottom_right_tile = np.rot90(bottom_right["tile"],2)
         bottom_left_tile = np.rot90(bottom_left["tile"],1)
-        bottom_left_tile[:,self.boardsize-1] = np.max(bottom_left_tile[:,self.boardsize-1],bottom_right_tile[:,0])
-        bottom_half = np.hstack(bottom_left_tile, bottom_right_tile[:,1:])
+        bottom_left_tile[:,self.boardsize-1] = np.maximum(bottom_left_tile[:,self.boardsize-1],bottom_right_tile[:,0])
+        bottom_half = np.hstack((bottom_left_tile, bottom_right_tile[:,1:]))
         
         #check overlap and join
-        game_board[self.boardsize-1,:] = np.max(game_board[self.boardsize-1,:],bottom_half[0,:])
-        game_board = np.vstack(game_board, bottom_half[1:,:])
+        game_board[self.boardsize-1,:] = np.maximum(game_board[self.boardsize-1,:],bottom_half[0,:])
+        game_board = np.vstack((game_board, bottom_half[1:,:]))
         
-        #determine flag locations
-        flags = {"red":[], "yellow":[], "green":[], "blue":[], "rainbow":[]}
-        
-        for colour in flags.keys():
-            if top_left["flags"][colour] is not None:
-                flags[colour].append(top_left["flags"][colour])
-            if top_right["flags"][colour] is not None:
-                flags[colour].append(rotate_clockwise(top_right["flags"][colour],self.gridsize))
-            if bottom_right["flags"][colour] is not None:
-                flags[colour].append(rotate_clockwise(top_right["flags"][colour],self.gridsize))
-
-        
+        #determine flag locations             
+        flags = []
+        for colour in top_left["flags"].keys():
+            flags.append({"location":top_left["flags"][colour], "colour":colour})
+        for flag in top_right["flags"]:
+            flags.append({"location":offset_coord(rot90_coord(top_right["flags"][colour],3,self.gridsize),0,8), "colour":colour})
+        for flag in top_left["flags"]:
+            flags.append({"location":offset_coord(rot90_coord(bottom_right["flags"][colour],2,self.gridsize),8,8), "colour":colour})
+        for flag in top_left["flags"]:
+            flags.append({"location":offset_coord(rot90_coord(top_right["flags"][colour],1,self.gridsize),8,0), "colour":colour})
+             
         return game_board, flags
        
     def __init__(self):
@@ -123,7 +112,7 @@ class Board(object):
         
         for board in range(4):
             for tile in range(2):
-                self.initialise_tile(self,board,tile)
+                self.initialise_tile(board,tile)
                 for wall in self.tiles[board][tile]["vwalls"]:
                     self.tiles[board][tile]["tile"][1+2*(wall[0]-1),2*wall[1]] = 1
                 for wall in self.tiles[board][tile]["hwalls"]:

@@ -6,7 +6,8 @@ Created on Thu Dec 25 22:48:05 2014
 """
 import pygame
 import numpy as np
-from grid_tools import getXYOffset,getXYGridOffset,getIJBoard,getIJGrid
+from grid_tools import getIJBoard,getIJGrid
+from tiles import Tiles
 
 #functions to initialise board for ricochet robots
         
@@ -17,18 +18,11 @@ class Board(object):
     #2=centre tiles
     #3=robot
     #-1=flag, negative since positive values block robot movement
-    def __init__(self,gridsize,boardsize):
-        self.gridsize = gridsize
-        self.boardsize = boardsize
-        self.boardstate = np.full((boardsize,boardsize),0,dtype=int)
-        #default walls
-        self.boardstate[:,0] = [1]*boardsize
-        self.boardstate[0,:] = [1]*boardsize
-        self.boardstate[:,boardsize-1] = [1]*boardsize
-        self.boardstate[boardsize-1,:] = [1]*boardsize
-        #centre walls
-        self.boardstate[gridsize-2:gridsize+3,gridsize-2:gridsize+3] = np.full((5,5),1,dtype=int)
-        self.boardstate[gridsize-1:gridsize+2,gridsize-1:gridsize+2] = np.full((3,3),2,dtype=int)
+    def __init__(self):
+        #initialise game board tiles and array sizes
+        self.tiles = Tiles()
+        self.gridsize = 2*self.tiles.gridsize
+        self.boardsize = 1 + 2*self.gridsize
         
         #create robots map too
         self.robot_colours=["yellow","red","green","blue","silver"]
@@ -37,28 +31,24 @@ class Board(object):
 
         
     def initialise(self):    
-        #generate random configuration of walls and update state         
-        #sample board: y,x format for np array filling referenced to robot's gridsize*gridsize game board
-        vwalls=[(1,5),(1,11),(2,3),(2,9),(3,16),(4,1),(5,6),(5,11),(7,6),(7,12),(8,4),(10,4),(10,15),(11,9),(12,1),(12,13),(13,7),(14,10),(15,2),(16,6),(16,12)]
-        hwalls=[(2,3),(2,10),(2,15),(4,2),(4,7),(5,1),(5,11),(5,16),(6,6),(6,13),(8,4),(9,4),(10,9),(10,15),(11,16),(12,2),(12,14),(13,7),(13,11),(14,1),(14,3)]
-        
-        for wall in vwalls:
-            self.boardstate[1+2*(wall[0]-1),2*wall[1]]=1
-        for wall in hwalls:
-            self.boardstate[2*wall[0],1+2*(wall[1]-1)]=1
-        
+        #generate random configuration of board tiles   
+        self.boardstate, self.flaglocs = self.tiles.generate_game_board()      
         
         #initialize target
-        flaglocs=[(10,4)]
-        #pick a random target from possibles
-        self.flagloc=flaglocs[np.random.randint(len(flaglocs))]
+        #pick a random target from 17 possibles
+        self.flag_order = np.random.permutation(len(self.flaglocs))
+        self.turn = 0
+        self.flagloc=self.flaglocs[self.flag_order[self.turn]]["location"]
         self.boardstate[getIJBoard(*self.flagloc)]=-1     
-        self.flag_colour="yellow"
+        self.flag_colour=self.flaglocs[self.flag_order[self.turn]]["colour"]
         
         #randomise robot start position(s)
         for colour in self.robot_colours:
             self.robots[colour]=Robot(colour,self)
-        self.active_robot="yellow"
+        if self.flag_colour=="rainbow":
+            self.active_robot="silver"
+        else:
+            self.active_robot=self.flag_colour
         
         self.victory=False
         self.moves_taken=0
@@ -84,6 +74,11 @@ class Board(object):
         
     def new_turn(self):
         #choose new flag location and colour, leave robots in place
+        self.turn+=1
+        #reset flag    
+        self.boardstate[getIJBoard(*self.flagloc)]=-1     
+        self.victory=False
+        self.moves_taken=0
         return
 
     def new_game(self):
@@ -120,7 +115,7 @@ class Board(object):
             
     def check_victory(self):
         #need to reach the flag with the same coloured robot
-        if (tuple(self.robots[self.active_robot].position)==self.flagloc) and (self.flag_colour==self.active_robot):
+        if (tuple(self.robots[self.active_robot].position)==self.flagloc) and ((self.flag_colour==self.active_robot) or (self.flag_colour=="rainbow")):
             self.victory=True
             return True
         else:

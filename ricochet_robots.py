@@ -7,9 +7,6 @@ Created on Thu Dec 25 22:51:16 2014
 
 #required modules and functions
 import sys, pygame
-import numpy as np
-from grid_globals import gridsize,boardsize
-from grid_tools import getXYOffset,getXYGridOffset,getIJBoard,getIJGrid
 from initialise_game import Board
 from graphics import Graphics
 
@@ -17,11 +14,11 @@ from graphics import Graphics
 pygame.init()
 
 #initialise board
-board = Board(gridsize,boardsize)
+board = Board()
 board.initialise()
 
 #initialise display of board
-images = Graphics(gridsize,boardsize)
+images = Graphics(board.gridsize,board.boardsize)
 images.draw_initial_board(images.screen,board)
 
 #respond to input

@@ -5,7 +5,7 @@ Created on Sun Dec 28 11:49:54 2014
 @author: Phil.Howard
 """
 import pygame
-from grid_tools import getXYOffset,getXYGridOffset,getIJBoard,getIJGrid,check_flag_between_grid_locations
+from grid_tools import getXYOffset,getXYGridOffset,check_flag_between_grid_locations
 from sidebar import Sidebar
 
 #functions to initialise graphics for ricochet robots
@@ -143,7 +143,7 @@ class Graphics(object):
         if key in (pygame.K_1,pygame.K_2,pygame.K_3,pygame.K_4,pygame.K_5,pygame.K_KP1,pygame.K_KP2,pygame.K_KP3,pygame.K_KP4,pygame.K_KP5):
             self.sidebar.update_active_text(board.active_robot) 
             
-        #determine number of frames from speed and dieffrence between new robot position and old
+        #determine number of frames from speed and difference between new robot position and old
         xnew,ynew=getXYGridOffset(robot.position[0],
                                     robot.position[1],
                                     self)
@@ -180,7 +180,7 @@ class Graphics(object):
                                 (self.wallsize+(robot.position[1]+i-1)*(self.tilesize+self.wallsize),
                                  self.wallsize+(robot.position[0]-1)*(self.tilesize+self.wallsize)))
                 if draw_flag:
-                    screen.blit(self.flag,flagloc)
+                    screen.blit(self.flags[board.flag_colour],flagloc)
                 robotrect=robotrect.move(velocity)
                 screen.blit(robot_image,robotrect)
                 #pygame.display.flip()
@@ -202,7 +202,7 @@ class Graphics(object):
                                 (self.wallsize+(robot.last_position[1]+i-1)*(self.tilesize+self.wallsize),
                                  self.wallsize+(robot.last_position[0]-1)*(self.tilesize+self.wallsize)))
                 if draw_flag:
-                    screen.blit(self.flag,flagloc)
+                    screen.blit(self.flags[board.flag_colour],flagloc)
                 robotrect=robotrect.move(velocity)
                 screen.blit(robot_image,robotrect)
                 #pygame.display.flip()
@@ -223,7 +223,7 @@ class Graphics(object):
                                 (self.wallsize+(robot.position[1]-1)*(self.tilesize+self.wallsize),
                                  self.wallsize+(robot.position[0]+i-1)*(self.tilesize+self.wallsize)))
                 if draw_flag:
-                    screen.blit(self.flag,flagloc)
+                    screen.blit(self.flags[board.flag_colour],flagloc)
                 robotrect=robotrect.move(velocity)
                 screen.blit(robot_image,robotrect)
                 #pygame.display.flip()
@@ -244,7 +244,7 @@ class Graphics(object):
                                 (self.wallsize+(robot.last_position[1]-1)*(self.tilesize+self.wallsize),
                                  self.wallsize+(robot.last_position[0]+i-1)*(self.tilesize+self.wallsize)))
                 if draw_flag:
-                    screen.blit(self.flag,flagloc)
+                    screen.blit(self.flags[board.flag_colour],flagloc)
                 robotrect=robotrect.move(velocity)
                 screen.blit(robot_image,robotrect)
                 #pygame.display.flip()
