@@ -68,22 +68,28 @@ class Board(object):
             self.boardstate[getIJBoard(*tuple(self.robots[colour].position))]=3
             
         #reset flag    
-        self.boardstate[getIJBoard(*self.flagloc)]=-1     
+        #check whether a robot is here first 
+        if self.boardstate[getIJBoard(*self.flagloc)]==0:
+            self.boardstate[getIJBoard(*self.flagloc)]=-1     
         self.victory=False
         self.moves_taken=0
         
     def new_turn(self):
         #choose new flag location and colour, leave robots in place
         self.turn+=1
+        self.flagloc=self.flaglocs[self.flag_order[self.turn]]["location"]
+        self.flag_colour=self.flaglocs[self.flag_order[self.turn]]["colour"]
+        
         #reset flag    
-        self.boardstate[getIJBoard(*self.flagloc)]=-1     
+        #check whether a robot is here first TODO
+        if self.boardstate[getIJBoard(*self.flagloc)]==0:
+            self.boardstate[getIJBoard(*self.flagloc)]=-1   
         self.victory=False
         self.moves_taken=0
-        return
 
     def new_game(self):
         #choose new board configurations and initialise again
-        return
+        self.initialise()
         
     #move_active_robot    
     def process_keypress(self,key):

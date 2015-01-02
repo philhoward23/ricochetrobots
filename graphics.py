@@ -67,7 +67,6 @@ class Graphics(object):
         self.background=200,200,200
         self.screen=pygame.display.set_mode(self.screensize)
         pygame.display.set_caption("Ricochet Robots")
-        self.screen.fill(self.background)  
     
     def redraw_flag(self,screen,board):
         screen.blit(self.flags[board.flag_colour],getXYGridOffset(board.flagloc[0],board.flagloc[1],self))
@@ -80,6 +79,9 @@ class Graphics(object):
         
     
     def draw_initial_board(self,screen,board):
+        #clear any previous game state
+        self.screen.fill(self.background)  
+        
         #sidebar - check if already exists in case of board reset
         if hasattr(self, 'sidebar'):
             self.sidebar.__init__(self,screen,board)
@@ -113,12 +115,12 @@ class Graphics(object):
         #draw flag
         self.redraw_flag(screen,board)
                 
-        #draw robot(s) at their turn start positions
+        #draw robot(s) at their turn start positions, which should be same as current in all cases
         self.robot_rects={}
         for colour in board.robot_colours:
-            screen.blit(self.robots[colour],getXYGridOffset(board.robots[colour].turn_start_position[0],board.robots[colour].turn_start_position[1],self))
+            screen.blit(self.robots[colour],getXYGridOffset(board.robots[colour].position[0],board.robots[colour].position[1],self))
             self.robot_rects[colour]=self.robots[colour].get_rect()
-            self.robot_rects[colour]=self.robot_rects[colour].move(getXYGridOffset(board.robots[colour].turn_start_position[0],board.robots[colour].turn_start_position[1],self))
+            self.robot_rects[colour]=self.robot_rects[colour].move(getXYGridOffset(board.robots[colour].position[0],board.robots[colour].position[1],self))
         
         pygame.display.flip()
         

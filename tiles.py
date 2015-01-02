@@ -55,13 +55,17 @@ class Tiles(object):
         #determine flag locations             
         flags = []
         for colour in top_left["flags"].keys():
-            flags.append({"location":top_left["flags"][colour], "colour":colour})
-        for flag in top_right["flags"]:
-            flags.append({"location":offset_coord(rot90_coord(top_right["flags"][colour],3,self.gridsize),0,8), "colour":colour})
-        for flag in top_left["flags"]:
-            flags.append({"location":offset_coord(rot90_coord(bottom_right["flags"][colour],2,self.gridsize),8,8), "colour":colour})
-        for flag in top_left["flags"]:
-            flags.append({"location":offset_coord(rot90_coord(top_right["flags"][colour],1,self.gridsize),8,0), "colour":colour})
+            if top_left["flags"][colour] != None:
+                flags.append({"location":top_left["flags"][colour], "colour":colour})
+        for colour in top_right["flags"].keys():
+            if top_right["flags"][colour] != None:
+                flags.append({"location":offset_coord(rot90_coord(top_right["flags"][colour],3,self.gridsize),0,8), "colour":colour})
+        for colour in bottom_right["flags"].keys():
+            if bottom_right["flags"][colour] != None:
+                flags.append({"location":offset_coord(rot90_coord(bottom_right["flags"][colour],2,self.gridsize),8,8), "colour":colour})
+        for colour in bottom_left["flags"].keys():
+            if bottom_left["flags"][colour] != None:
+                flags.append({"location":offset_coord(rot90_coord(bottom_left["flags"][colour],1,self.gridsize),8,0), "colour":colour})
              
         return game_board, flags
        
