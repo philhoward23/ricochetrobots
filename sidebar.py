@@ -6,7 +6,7 @@ Created on Mon Dec 29 15:53:55 2014
 """
 import pygame
 import pygame.freetype
-#import textwrap
+from textwrap import render_textrect
 
 class Sidebar(object):
     def update_moves_text(self,moves):
@@ -54,12 +54,13 @@ class Sidebar(object):
         #text for game messages
         self.fontsize = 20
         self.font = pygame.freetype.SysFont('Impact', self.fontsize)
+        self.docs_font = pygame.font.SysFont('Impact',self.fontsize)
         self.info_text, self.info_text_rect = self.font.render('Reach the flag with the', fgcolor=(0, 0, 0), bgcolor=None)
         self.info_text_line2, self.info_text_line2_rect = self.font.render('matching robot!', fgcolor=(0, 0, 0), bgcolor=None)
         self.active_text, self.active_text_rect = self.font.render('The %s robot is active' % board.active_robot, fgcolor=(0, 0, 0), bgcolor=None)
         self.moves_text, self.moves_text_rect = self.font.render('%d moves taken this turn' % board.moves_taken, fgcolor=(0, 0, 0), bgcolor=None)
         self.turns_text, self.turns_text_rect = self.font.render('Flag %d of 17' % min(board.turn,17), fgcolor=(0, 0, 0), bgcolor=None)
-                
+        
         #create panes for the text displays
         
         self.info_box = pygame.Surface((graphics.sidebar_rect.width, 5*self.info_text_rect.height + 2*graphics.wallsize)).convert()
@@ -82,6 +83,10 @@ class Sidebar(object):
         self.turns_box_rect = self.turns_box.get_rect()
         self.turns_box_rect = self.turns_box_rect.move(graphics.sidebar_rect.left, graphics.title.get_height() + self.info_box.get_height() + self.active_box.get_height() + self.moves_box.get_height())        
 
+        self.docs_box_rect = pygame.Rect(graphics.sidebar_rect.left + graphics.wallsize, self.turns_box_rect.bottom, graphics.sidebar_rect.width - graphics.wallsize, graphics.sidebar_rect.height - self.turns_box_rect.bottom)
+        self.docs_box_text = "Please press:\n1-5 to activate that robot\nPress r to restart this turn\nPress n for the next flag\nPress g for a new game"
+        self.docs_box = render_textrect(self.docs_box_text, self.docs_font, self.docs_box_rect, (0, 0, 0), self.background, justification=0)
+        
         #initialise contents
         self.screen.blit(self.info_box, self.info_box_rect)
         self.screen.blit(self.active_box, self.active_box_rect)
@@ -98,5 +103,5 @@ class Sidebar(object):
         self.screen.blit(self.moves_text, self.moves_text_rect)
         self.turns_text_rect=self.turns_text_rect.move(self.turns_box_rect.left + graphics.wallsize, self.turns_box_rect.top + graphics.wallsize)
         self.screen.blit(self.turns_text, self.turns_text_rect)
-
+        self.screen.blit(self.docs_box,self.docs_box_rect)
         
