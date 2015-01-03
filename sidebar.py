@@ -58,6 +58,7 @@ class Sidebar(object):
         self.info_text_line2, self.info_text_line2_rect = self.font.render('matching robot!', fgcolor=(0, 0, 0), bgcolor=None)
         self.active_text, self.active_text_rect = self.font.render('The %s robot is active' % board.active_robot, fgcolor=(0, 0, 0), bgcolor=None)
         self.moves_text, self.moves_text_rect = self.font.render('%d moves taken this turn' % board.moves_taken, fgcolor=(0, 0, 0), bgcolor=None)
+        self.turns_text, self.turns_text_rect = self.font.render('Flag %d of 17' % min(board.turn,17), fgcolor=(0, 0, 0), bgcolor=None)
                 
         #create panes for the text displays
         
@@ -76,10 +77,16 @@ class Sidebar(object):
         self.moves_box_rect = self.moves_box.get_rect()
         self.moves_box_rect = self.moves_box_rect.move(graphics.sidebar_rect.left, graphics.title.get_height() + self.info_box.get_height() + self.active_box.get_height())        
         
+        self.turns_box = pygame.Surface((graphics.sidebar_rect.width, 3*self.turns_text_rect.height + 2*graphics.wallsize)).convert()
+        self.turns_box.fill(self.background)
+        self.turns_box_rect = self.turns_box.get_rect()
+        self.turns_box_rect = self.turns_box_rect.move(graphics.sidebar_rect.left, graphics.title.get_height() + self.info_box.get_height() + self.active_box.get_height() + self.moves_box.get_height())        
+
         #initialise contents
         self.screen.blit(self.info_box, self.info_box_rect)
         self.screen.blit(self.active_box, self.active_box_rect)
         self.screen.blit(self.moves_box, self.moves_box_rect)
+        self.screen.blit(self.turns_box, self.turns_box_rect)
         
         self.info_text_rect=self.info_text_rect.move(self.info_box_rect.left + graphics.wallsize, self.info_box_rect.top + graphics.wallsize)
         self.screen.blit(self.info_text, self.info_text_rect)
@@ -89,5 +96,7 @@ class Sidebar(object):
         self.screen.blit(self.active_text, self.active_text_rect)
         self.moves_text_rect=self.moves_text_rect.move(self.moves_box_rect.left + graphics.wallsize, self.moves_box_rect.top + graphics.wallsize)
         self.screen.blit(self.moves_text, self.moves_text_rect)
+        self.turns_text_rect=self.turns_text_rect.move(self.turns_box_rect.left + graphics.wallsize, self.turns_box_rect.top + graphics.wallsize)
+        self.screen.blit(self.turns_text, self.turns_text_rect)
 
         
