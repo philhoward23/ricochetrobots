@@ -58,8 +58,8 @@ class Sidebar(object):
         self.info_text, self.info_text_rect = self.font.render('Reach the flag with the', fgcolor=(0, 0, 0), bgcolor=None)
         self.info_text_line2, self.info_text_line2_rect = self.font.render('matching robot!', fgcolor=(0, 0, 0), bgcolor=None)
         self.active_text, self.active_text_rect = self.font.render('The %s robot is active' % board.active_robot, fgcolor=(0, 0, 0), bgcolor=None)
-        self.moves_text, self.moves_text_rect = self.font.render('%d moves taken this turn' % board.moves_taken, fgcolor=(0, 0, 0), bgcolor=None)
-        self.turns_text, self.turns_text_rect = self.font.render('Flag %d of 17' % min(board.turn,17), fgcolor=(0, 0, 0), bgcolor=None)
+        self.moves_text, self.moves_text_rect = self.font.render('%d moves taken this flag' % board.moves_taken, fgcolor=(0, 0, 0), bgcolor=None)
+        self.turns_text, self.turns_text_rect = self.font.render('Flag %d of 17' % min(1+board.turn,17), fgcolor=(0, 0, 0), bgcolor=None)
         
         #create panes for the text displays
         
