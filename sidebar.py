@@ -13,7 +13,7 @@ class Sidebar(object):
         #clear
         self.screen.blit(self.moves_box, self.moves_box_rect)
         #update
-        self.moves_text, new_text_rect = self.font.render('%d moves taken this turn' % moves, fgcolor=(0, 0, 0), bgcolor=None)
+        self.moves_text, new_text_rect = self.font.render('%d moves taken this flag' % moves, fgcolor=(0, 0, 0), bgcolor=None)
         self.moves_text_rect.height = new_text_rect.height
         self.moves_text_rect.width = new_text_rect.width
         self.screen.blit(self.moves_text, self.moves_text_rect)

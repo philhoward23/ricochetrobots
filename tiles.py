@@ -79,37 +79,45 @@ class Tiles(object):
         #define all 8 possible tiles                
         self.tiles = [ [ {"vwalls":[(1,2), (2,4), (3,2), (4,7), (7,3)],
                      "hwalls":[(1,5), (2,2), (4,7), (6,1), (7,4)], 
+                     "cwalls":[(1,4), (2,2), (4,7), (7,3)],          
                      "flags":{"red":(2,5), "yellow":(4,7), "green":(3,2), "blue":(7,4), "rainbow":None}
                     },
                     {"vwalls":[(1,5), (2,7), (3,1), (6,7), (7,3)],
                      "hwalls":[(2,2), (2,7), (5,7), (6,1), (7,4)], 
+                     "cwalls":[(2,1), (2,7), (5,7), (7,3)],          
                      "flags":{"red":(7,4), "yellow":(2,7), "green":(3,2), "blue":(6,7), "rainbow":None}
                     } 
                   ],
                   [ {"vwalls":[(1,5), (2,3), (4,1), (5,6), (7,6), (8,4)],
                      "hwalls":[(2,3), (4,2), (4,7), (5,1), (6,6), (8,4)], 
+                     "cwalls":[(2,3), (4,1), (4,6), (6,6), (8,4)],          
                      "flags":{"red":(2,3), "yellow":(5,7), "green":(4,2), "blue":(7,6), "rainbow":(8,4)}
                     },
                     {"vwalls":[(1,4), (2,6), (4,2), (5,5), (6,3), (6,8)],
                      "hwalls":[(2,7), (3,2), (4,6), (6,3), (6,8), (7,1)], 
+                     "cwalls":[(2,6), (3,2), (4,5), (6,3), (6,8)],          
                      "flags":{"red":(6,3), "yellow":(4,2), "green":(5,6), "blue":(2,7), "rainbow":(6,8)}
                     } 
                   ],
                   [ {"vwalls":[(1,4), (2,1), (3,7), (5,3), (6,7)],
-                     "hwalls":[(2,2), (2,7), (5,3), (5,8), (6,1)], 
+                     "hwalls":[(2,2), (2,7), (5,3), (5,8), (6,1)],
+                     "cwalls":[(2,1), (2,7), (5,3), (5,7)],          
                      "flags":{"red":(2,2), "yellow":(6,8), "green":(3,7), "blue":(5,3), "rainbow":None}
                     },
                     {"vwalls":[(1,4), (3,6), (5,3), (6,7), (7,1)],
                      "hwalls":[(3,6), (4,3), (5,1), (6,2), (6,8)], 
+                     "cwalls":[(3,6), (4,3), (6,1), (6,7)],          
                      "flags":{"red":(6,8), "yellow":(7,2), "green":(5,3), "blue":(3,6), "rainbow":None}
                     } 
                   ],
                   [ {"vwalls":[(1,4), (2,6), (3,1), (5,6), (7,3)],
                      "hwalls":[(2,6), (3,2), (4,1), (4,7), (6,3)], 
+                     "cwalls":[(2,6), (3,1), (4,6), (6,3)],          
                      "flags":{"red":(3,2), "yellow":(5,7), "green":(2,6), "blue":(7,3), "rainbow":None}
                     },
                     {"vwalls":[(1,5), (2,2), (4,6), (6,5), (7,2)],
                      "hwalls":[(1,3), (4,7), (5,1), (5,5), (7,2)], 
+                     "cwalls":[(1,2), (4,6), (5,5), (7,2)],          
                      "flags":{"red":(6,5), "yellow":(2,3), "green":(7,2), "blue":(4,7), "rainbow":None}
                     } 
                   ]
@@ -123,6 +131,8 @@ class Tiles(object):
                     self.tiles[board][tile]["tile"][1+2*(wall[0]-1),2*wall[1]] = 1
                 for wall in self.tiles[board][tile]["hwalls"]:
                     self.tiles[board][tile]["tile"][2*wall[0],1+2*(wall[1]-1)] = 1
+                for wall in self.tiles[board][tile]["cwalls"]:
+                    self.tiles[board][tile]["tile"][2*wall[0],2*wall[1]] = 1
 
 
         

@@ -96,6 +96,12 @@ class Board(object):
             self.flagloc=self.flaglocs[self.flag_order[self.turn]]["location"]
             self.flag_colour=self.flaglocs[self.flag_order[self.turn]]["colour"]
             
+            #update robot turn start info
+            for colour in self.robot_colours:
+                #reset turn start position
+                self.robots[colour].turn_start_position=self.robots[colour].position
+                self.robots[colour].last_position=self.robots[colour].turn_start_position
+                
             #reset flag    
             #check whether a robot is here first TODO
             if self.boardstate[getIJBoard(*self.flagloc)]==0:
@@ -103,7 +109,7 @@ class Board(object):
             self.victory=False
             self.moves_taken=0
         else:
-            #all flag positions solved for this game - user must (r)eset or start a new (g)ame
+            #all flag positions solved for this game - user must (r)eset or start a (n)ew game
             return
 
     def new_game(self):

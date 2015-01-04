@@ -160,7 +160,7 @@ class Graphics(object):
         flagloc=getXYGridOffset(board.flagloc[0],board.flagloc[1],self)
         
         #set lag to slow movement
-        frame_delay=0
+        frame_delay=4
         
         if key == pygame.K_LEFT:
             #print 'left pressed'
