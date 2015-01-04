@@ -59,7 +59,7 @@ class Sidebar(object):
         self.info_text_line2, self.info_text_line2_rect = self.font.render('matching robot!', fgcolor=(0, 0, 0), bgcolor=None)
         self.active_text, self.active_text_rect = self.font.render('The %s robot is active' % board.active_robot, fgcolor=(0, 0, 0), bgcolor=None)
         self.moves_text, self.moves_text_rect = self.font.render('%d moves taken this flag' % board.moves_taken, fgcolor=(0, 0, 0), bgcolor=None)
-        self.turns_text, self.turns_text_rect = self.font.render('Flag %d of 17' % min(1+board.turn,17), fgcolor=(0, 0, 0), bgcolor=None)
+        self.turns_text, self.turns_text_rect = self.font.render('Flag %d of 17 this game' % min(1+board.turn,17), fgcolor=(0, 0, 0), bgcolor=None)
         
         #create panes for the text displays
         
@@ -84,7 +84,7 @@ class Sidebar(object):
         self.turns_box_rect = self.turns_box_rect.move(graphics.sidebar_rect.left, graphics.title.get_height() + self.info_box.get_height() + self.active_box.get_height() + self.moves_box.get_height())        
 
         self.docs_box_rect = pygame.Rect(graphics.sidebar_rect.left + graphics.wallsize, self.turns_box_rect.bottom, graphics.sidebar_rect.width - graphics.wallsize, graphics.sidebar_rect.height - self.turns_box_rect.bottom)
-        self.docs_box_text = "Please press:\n1-5 to activate that robot\nPress r to restart this turn\nPress n for the next flag\nPress g for a new game"
+        self.docs_box_text = "Please press:\n1-5 to activate that robot\nPress r to restart this flag\nPress f for the next flag\nPress n for a new game"
         self.docs_box = render_textrect(self.docs_box_text, self.docs_font, self.docs_box_rect, (0, 0, 0), self.background, justification=0)
         
         #initialise contents

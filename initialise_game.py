@@ -52,13 +52,28 @@ class Board(object):
         
         self.victory=False
         self.moves_taken=0
+        self.last_pressed=None
         
         #display configuration
         for i in range(self.boardsize):
             print self.boardstate[i]
     
     
-    def reset_turn(self):
+    def undo_move(self):
+        #erase current location
+        self.boardstate[getIJBoard(*tuple(self.robots[self.active_robot].position))]=0
+        #reset to last position
+        self.robots[self.active_robot].position=self.robots[self.active_robot].last_position
+        self.boardstate[getIJBoard(*tuple(self.robots[self.active_robot].position))]=3
+            
+        #reset flag    
+        #check whether a robot is here first 
+        if self.boardstate[getIJBoard(*self.flagloc)]==0:
+            self.boardstate[getIJBoard(*self.flagloc)]=-1     
+        self.victory=False
+        self.moves_taken = max(self.moves_taken - 1, 0)
+        
+    def reset_flag(self):
         for colour in self.robot_colours:
             #erase current location
             self.boardstate[getIJBoard(*tuple(self.robots[colour].position))]=0
@@ -74,7 +89,7 @@ class Board(object):
         self.victory=False
         self.moves_taken=0
         
-    def new_turn(self):
+    def new_flag(self):
         self.turn+=1
         if self.turn<17:
             #choose new flag location and colour, leave robots in place
@@ -99,18 +114,21 @@ class Board(object):
     def process_keypress(self,key):
         #check for victory state - only allows reset options
         if self.victory:
-            if key not in (pygame.K_r,pygame.K_n,pygame.K_g):
+            if key not in (pygame.K_r,pygame.K_n,pygame.K_f,pygame.K_u):
                 print "In victory state, please reset turn or start a new game"
                 return
         
+        #check for undo (pressed u)
+        if key==pygame.K_u and (self.last_pressed in (pygame.K_LEFT,pygame.K_RIGHT,pygame.K_UP,pygame.K_DOWN)):
+            self.undo_move()
         #check for reset (pressed r)
-        if key==pygame.K_r:
-            self.reset_turn()
-        #check for new turn (pressed n)
+        elif key==pygame.K_r:
+            self.reset_flag()
+        #check for new turn (pressed f)
+        elif key==pygame.K_f:
+            self.new_flag()
+        #check for new game (pressed n)
         elif key==pygame.K_n:
-            self.new_turn()
-        #check for new game (pressed g)
-        elif key==pygame.K_g:
             self.new_game() 
         #check for movement
         elif key in (pygame.K_LEFT,pygame.K_RIGHT,pygame.K_UP,pygame.K_DOWN):
@@ -121,6 +139,10 @@ class Board(object):
         else:
             #no action for this key
             print "Input not recognised"
+            
+        #save input for reference
+        self.last_pressed = key
+        
         return
             
     def check_victory(self):
