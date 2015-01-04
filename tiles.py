@@ -35,17 +35,18 @@ class Tiles(object):
         bottom_left = self.tiles[board_order[3]][board_variants[3]]  
         
         #assemble game board
-        #make sure to take copies rather than risk modifying tiles eg when taking maximum in what follows. rot90 returns a copy
+        #make sure to take copies rather than risk modifying tiles eg when taking maximum in what follows. 
         game_board = np.copy(top_left["tile"])
-        top_right_tile = np.rot90(top_right["tile"],3)
+        #rot90 should return a copy but seem to need np.copy to avoid problems nevertheless...
+        top_right_tile = np.rot90(np.copy(top_right["tile"]),3)
         
         #check overlap and join
         game_board[:,self.boardsize-1] = np.maximum(game_board[:,self.boardsize-1],top_right_tile[:,0])
         game_board = np.hstack((game_board, top_right_tile[:,1:]))
         
         #generate bottom half of game board
-        bottom_right_tile = np.rot90(bottom_right["tile"],2)
-        bottom_left_tile = np.rot90(bottom_left["tile"],1)
+        bottom_right_tile = np.rot90(np.copy(bottom_right["tile"]),2)
+        bottom_left_tile = np.rot90(np.copy(bottom_left["tile"]),1)
         bottom_left_tile[:,self.boardsize-1] = np.maximum(bottom_left_tile[:,self.boardsize-1],bottom_right_tile[:,0])
         bottom_half = np.hstack((bottom_left_tile, bottom_right_tile[:,1:]))
         

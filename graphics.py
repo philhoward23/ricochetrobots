@@ -121,13 +121,13 @@ class Graphics(object):
         
     def animate(self,board,key):                
         #check for reset (pressed r)
-        if key in (pygame.K_r,pygame.K_n,pygame.K_g):
+        if key in (pygame.K_r,pygame.K_n,pygame.K_f,pygame.K_u):
             self.draw_initial_board(board)
             return
         
         #check for victory state - only allows reset options unless still needs to do the final animation to reach that state
         if board.victory and ((self.robot_rects[board.active_robot].left,self.robot_rects[board.active_robot].top)==getXYGridOffset(board.flagloc[0],board.flagloc[1],self)):
-            if key not in (pygame.K_r,pygame.K_n,pygame.K_g):
+            if key not in (pygame.K_r,pygame.K_n,pygame.K_f,pygame.K_u):
                 return        
         
         #find active robot
