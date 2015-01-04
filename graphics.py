@@ -124,10 +124,15 @@ class Graphics(object):
         if key in (pygame.K_r,pygame.K_n,pygame.K_f,pygame.K_u):
             self.draw_initial_board(board)
             return
-        
+               
+        #check for show flags (pressed s)
+        if key==pygame.K_s:
+            self.redraw_flag(board)
+            return
+            
         #check for victory state - only allows reset options unless still needs to do the final animation to reach that state
         if board.victory and ((self.robot_rects[board.active_robot].left,self.robot_rects[board.active_robot].top)==getXYGridOffset(board.flagloc[0],board.flagloc[1],self)):
-            if key not in (pygame.K_r,pygame.K_n,pygame.K_f,pygame.K_u):
+            if key not in (pygame.K_r,pygame.K_n,pygame.K_f,pygame.K_u,pygame.K_s):
                 return        
         
         #find active robot

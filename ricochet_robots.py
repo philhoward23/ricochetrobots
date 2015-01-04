@@ -38,6 +38,10 @@ while 1:
             #check victory condition
             if board.check_victory():
                 images.sidebar.update_info_text('You made it to the flag','Congratulations!')        
+        
+        elif event.type==pygame.KEYUP and event.key==pygame.K_s:
+            #only for (s)how flags
+            images.redraw_robots(board)
             
         #screen.fill(black)
         #pygame.display.flip()

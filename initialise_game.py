@@ -120,7 +120,7 @@ class Board(object):
     def process_keypress(self,key):
         #check for victory state - only allows reset options
         if self.victory:
-            if key not in (pygame.K_r,pygame.K_n,pygame.K_f,pygame.K_u):
+            if key not in (pygame.K_r,pygame.K_n,pygame.K_f,pygame.K_u,pygame.K_s):
                 print "In victory state, please reset turn or start a new game"
                 return
         
@@ -136,6 +136,10 @@ class Board(object):
         #check for new game (pressed n)
         elif key==pygame.K_n:
             self.new_game() 
+        #check for show flag (pressed s)
+        elif key==pygame.K_s:
+            #do not reset last pressed
+            return
         #check for movement
         elif key in (pygame.K_LEFT,pygame.K_RIGHT,pygame.K_UP,pygame.K_DOWN):
             self.robots[self.active_robot].move(self,key)
